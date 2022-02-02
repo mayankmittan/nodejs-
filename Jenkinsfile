@@ -10,7 +10,7 @@ stage('Checkout') {
 
 steps {
 
-git branch: 'main',
+git branch: 'master',
 
 credentialsId: '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',
 
@@ -52,7 +52,7 @@ stage('Build') {
 
 steps {
 
-sh 'npm build'
+sh 'npm run-script build'
 
 }
 
@@ -62,7 +62,7 @@ stage('Deploy') {
 
 steps {
 
-sh 'npm start'
+sh 'npm run-script start'
 
 }
 
