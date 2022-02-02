@@ -1,31 +1,73 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:6-alpine'
-            args '-p 3000:3000'
-        }
-    }
-     environment {
-            CI = 'true'
-        }
-    stages {
-        stage('Build') {
-            steps {
-                sh 'npm install'
-            }
-        }
-        stage('Test') {
-                    steps {
-                        sh './jenkins/scripts/test.sh'
-                    }
-                }
-                stage('Deliver') {
-                            steps {
-                                sh './jenkins/scripts/deliver.sh'
-                                input message: 'Finished using the web site? (Click "Proceed" to continue)'
-                                sh './jenkins/scripts/kill.sh'
-                            }
-                        }
 
-    }
+agent any
+
+tools {nodejs ''}
+
+stages {
+
+stage('Checkout') {
+
+steps {
+
+git branch: 'main',
+
+credentialsId: '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',
+
+url: "https://github.com/mittanmayank/nodejs.git"
+
+}
+
+}
+
+stage('Install') {
+
+steps {
+
+sh 'npm install'
+
+}
+
+}
+
+
+
+stage('Sonar Analysis') {
+environment {
+SCANNER_HOME = tool 'sonar'
+PROJECT_NAME = "nodejs"
+}
+steps {
+withSonarQubeEnv('my_sonar') {
+sh '''$SCANNER_HOME/bin/sonar-scanner \
+-Dsonar.java.binaries=build/classes/java/ \
+-Dsonar.projectKey=$PROJECT_NAME \
+-Dsonar.sources=.'''
+}
+}
+}
+
+
+stage('Build') {
+
+steps {
+
+sh 'npm build'
+
+}
+
+}
+
+stage('Deploy') {
+
+steps {
+
+sh 'npm start'
+
+}
+
+}
+
+}
+
 }
