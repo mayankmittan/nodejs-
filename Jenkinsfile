@@ -62,7 +62,7 @@ stage('Deploy') {
 
 steps {
 
-sh 'npm run-script start'
+sh 'npm start'
 
 }
 
